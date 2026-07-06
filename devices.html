@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Devices - AetheriaOS</title>
+    <link href="https://fonts.cdnfonts.com/css/product-sans" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --card-bg: #080808;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: #9a9a9a;
+            --nav-bg: rgba(10, 10, 10, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Product Sans', sans-serif !important; }
+        body { background-color: var(--bg); color: var(--text-main); line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; position: relative; }
+
+        .glare-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .glare-bg::before, .glare-bg::after {
+            content: '';
+            position: absolute;
+            width: 60vmax;
+            height: 60vmax;
+            border-radius: 50%;
+            filter: blur(90px);
+            mix-blend-mode: screen;
+            opacity: 0.12;
+        }
+        .glare-bg::before {
+            top: -20%;
+            left: -10%;
+            background: radial-gradient(circle, #ffffff 0%, transparent 70%);
+            animation: glare-drift-1 18s ease-in-out infinite;
+        }
+        .glare-bg::after {
+            bottom: -25%;
+            right: -15%;
+            background: radial-gradient(circle, #ffffff 0%, transparent 70%);
+            animation: glare-drift-2 22s ease-in-out infinite;
+        }
+        @keyframes glare-drift-1 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(35vw, 25vh); }
+        }
+        @keyframes glare-drift-2 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30vw, -20vh); }
+        }
+
+        @keyframes navReveal {
+            0% { transform: translateX(-50%) translateY(-150%); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 8px 10px 8px 26px;
+            display: grid;
+            grid-template-columns: auto minmax(140px, 220px) 1fr;
+            align-items: center;
+            gap: 12px;
+            animation: navReveal 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+            transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        nav.nav-hidden {
+            transform: translateX(-50%) translateY(-150%);
+        }
+        nav { touch-action: pan-x; cursor: grab; }
+        nav:active { cursor: grabbing; }
+
+        .nav-handle {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            width: 60px;
+            height: 5px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.35);
+            z-index: 1001;
+            cursor: pointer;
+            touch-action: none;
+            transform: translateX(-50%) scaleX(0);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s;
+        }
+        .nav-handle.visible {
+            transform: translateX(-50%) scaleX(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .nav-handle:hover { background: rgba(255, 255, 255, 0.6); }
+
+        .back-home {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .back-home:hover { color: white; }
+
+        .nav-search {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            color: white;
+            font-size: 0.85rem;
+            padding: 10px 18px;
+            outline: none;
+            transition: 0.3s;
+            min-width: 0;
+        }
+        .nav-search:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.08); }
+        .nav-search::placeholder { color: var(--text-dim); }
+
+        .brand-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            min-width: 0;
+            justify-content: center;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+            padding: 2px;
+            mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
+        }
+        .brand-scroll::-webkit-scrollbar { display: none; height: 0; }
+
+        .brand-chip {
+            flex: 0 0 auto;
+            padding: 9px 18px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .brand-chip.active { background: white; color: black; border-color: white; }
+        .brand-chip:hover:not(.active) { border-color: white; color: white; }
+
+        header { text-align: center; padding: 120px 20px 40px; }
+        h1 { font-size: 3.5rem; font-weight: 400; margin-bottom: 10px; letter-spacing: -1.5px; }
+        h1 span { color: var(--text-dim); font-weight: 400; }
+
+        @media (max-width: 700px) {
+            nav { grid-template-columns: auto 1fr; }
+            .nav-search { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            header { padding: 110px 16px 30px; }
+            h1 { font-size: 2rem; letter-spacing: -1px; }
+            .card { flex: 0 0 260px; width: 260px; min-height: 440px; padding: 30px 20px; }
+            .grid { padding: 15px 4% 70px; gap: 16px; }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            header { padding: 90px 20px 25px; }
+            h1 { font-size: 2.2rem; }
+            .card { min-height: 360px; }
+            .card img { height: 130px; }
+        }
+
+        @media (min-width: 1200px) {
+            .card { flex: 0 0 320px; width: 320px; }
+        }
+
+        @media (min-resolution: 2dppx), (-webkit-min-device-pixel-ratio: 2) {
+            .card, nav, .brand-chip, .btn-download, .btn-spec {
+                border-width: 0.5px;
+            }
+        }
+
+        .grid {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: visible;
+            justify-content: safe center;
+            gap: 25px;
+            padding: 15px 5% 100px;
+            max-width: 1400px;
+            margin: 0 auto;
+            cursor: grab;
+            user-select: none;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .grid::-webkit-scrollbar { display: none; height: 0; }
+        .grid.dragging { cursor: grabbing; scroll-behavior: auto; }
+
+        .card {
+            flex: 0 0 300px;
+            width: 300px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 480px;
+            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            opacity: 0;
+            transform: translateY(24px);
+            animation: cardReveal 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+
+        @keyframes cardReveal {
+            0% { opacity: 0; transform: translateY(24px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid .card:nth-child(1) { animation-delay: 0.05s; }
+        .grid .card:nth-child(2) { animation-delay: 0.12s; }
+        .grid .card:nth-child(3) { animation-delay: 0.19s; }
+        .grid .card:nth-child(4) { animation-delay: 0.26s; }
+        .grid .card:nth-child(5) { animation-delay: 0.33s; }
+        .grid .card:nth-child(6) { animation-delay: 0.40s; }
+        .grid .card:nth-child(n+7) { animation-delay: 0.45s; }
+        .card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.2); background: #0c1016; }
+        .card.hidden { display: none; }
+
+        .card img { height: 200px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 25px; }
+
+        .device-name { font-size: 1.3rem; font-weight: 400; color: white; margin-bottom: 30px; }
+        .device-meta { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.7; }
+        .device-meta .codename { font-family: monospace; }
+        .device-meta .sep { opacity: 0.4; }
+
+        .card-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+
+        .btn-download, .btn-spec {
+            width: 100%;
+            padding: 14px;
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-download { background: white; color: black; }
+        .btn-download:hover { transform: scale(1.02); background: #f0f0f0; }
+
+        .btn-spec { background: transparent; color: white; border: 1px solid var(--border); }
+        .btn-spec:hover { border-color: white; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #0a0a0a;
+            border: 1px solid var(--border);
+            padding: 45px 40px;
+            border-radius: 32px;
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: 0.3s;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-content h2 { font-size: 1.8rem; margin-bottom: 15px; font-weight: 400; }
+        .modal-content .modal-body { color: var(--text-dim); font-size: 0.9rem; text-align: left; margin-bottom: 10px; white-space: pre-line; line-height: 1.7; }
+        .btn-close {
+            padding: 12px 40px;
+            background: white; color: black;
+            border: none; border-radius: 50px;
+            font-weight: bold; cursor: pointer; margin-top: 20px;
+        }
+
+        footer { text-align: center; padding: 60px; color: #444; border-top: 1px solid var(--border); font-size: 0.8rem; }
+
+        @media (max-width: 900px) {
+            .nav-left { display: none; }
+            nav { grid-template-columns: 1fr 1fr; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glare-bg"></div>
+
+    <nav>
+        <a href="./index.html" class="back-home">← Back to Home</a>
+        <input type="text" id="searchInput" class="nav-search" placeholder="Search...">
+        <div class="brand-scroll" id="brandScroll">
+            <button class="brand-chip active" data-filter="all">All</button>
+            <button class="brand-chip" data-filter="Xiaomi">Xiaomi</button>
+            <button class="brand-chip" data-filter="Redmi">Redmi</button>
+            <button class="brand-chip" data-filter="Poco">Poco</button>
+            <button class="brand-chip" data-filter="Sony">Sony</button>
+            <button class="brand-chip" data-filter="Asus">Asus</button>
+        </div>
+    </nav>
+
+    <div class="nav-handle" id="navHandle" title="Pull down to show the menu"></div>
+
+    <header>
+        <h1>Supported <span>Devices</span></h1>
+    </header>
+
+    <div class="grid" id="deviceGrid">
+
+      
+
+        <div class="card" data-brand="Xiaomi">
+            <div class="card-top">
+                <img src="devices/sagit/sagit.png" alt="Xiaomi Mi 6" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">N1709</span><span class="sep">│</span><span class="codename">sagit</span></span>
+                <h3 class="device-name">Xiaomi Mi 6</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="Xiaomi Mi 6"
+                    data-codename="sagit"
+                    data-maintainer="N1709"
+                    data-url="">Download</button>
+                <button class="btn-spec"
+                    data-name="Xiaomi Mi 6"
+                    data-specs="Chipset: Snapdragon 835
+RAM: 6 GB
+Storage: 64 / 128 GB
+Display: 5.15&quot; FHD
+Battery: 3350 mAh">Specifications</button>
+            </div>
+        </div>
+
+        <div class="card" data-brand="Sony">
+            <div class="card-top">
+                <img src="devices/apollo.png" alt="Sony XZ2 Compact" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">Ganx</span><span class="sep">│</span><span class="codename">apollo</span></span>
+                <h3 class="device-name">Sony XZ2 Compact</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="Sony XZ2 Compact"
+                    data-codename="apollo"
+                    data-maintainer="ganx0000"
+                    data-url="">Download</button>
+                <button class="btn-spec"
+                    data-name="Sony XZ2 Compact"
+                    data-specs="Chipset: Snapdragon 845
+RAM: 4 / 6 GB
+Storage: 64 GB
+Display: 5.0&quot; IPS LCD
+Battery: 2870 mAh">Specifications</button>
+            </div>
+        </div>
+
+        <div class="card" data-brand="Redmi">
+            <div class="card-top">
+                <img src="devices/sweet2.png" alt="Redmi Note 12 Pro 4G" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">ReversedRuler</span><span class="sep">│</span><span class="codename">sweet2</span></span>
+                <h3 class="device-name">Redmi Note 12 Pro 4G</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="Redmi Note 12 Pro 4G"
+                    data-codename="sweet2"
+                    data-maintainer="ReversedRuler"
+                    data-url="devices/sweet2/rom/sweet2.html">Download</button>
+                <button class="btn-spec"
+                    data-name="Redmi Note 12 Pro 4G"
+                    data-specs="Chipset: Snapdragon 732G
+RAM: 6 / 8 GB
+Storage: 128 / 256 GB
+Display: 6.67&quot; AMOLED
+Battery: 5000 mAh">Specifications</button>
+            </div>
+        </div>
+<div class="card" data-brand="Poco">
+            <div class="card-top">
+                <img src="devices/peridot.png" alt="POCO F6" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">ReversedRuler</span><span class="sep">│</span><span class="codename">peridot</span></span>
+                <h3 class="device-name">POCO F6</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="POCO F6"
+                    data-codename="peridot"
+                    data-maintainer="ReversedRuler"
+                    data-url="devices/peridot/rom/peridot.html">Download</button>
+                <button class="btn-spec"
+                    data-name="POCO F6"
+                    data-specs="Chipset: Snapdragon 8s Gen 3
+RAM: 8 / 12 GB
+Storage: 256 / 512 GB
+Display: 6.67&quot; AMOLED
+Battery: 5000 mAh">Specifications</button>
+            </div>
+        </div>
+
+        <div class="card" data-brand="Redmi">
+            <div class="card-top">
+                <img src="devices/santoni.png" alt="Redmi 4X" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">Alpha</span><span class="sep">│</span><span class="codename">santoni</span></span>
+                <h3 class="device-name">Redmi 4X</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="Redmi 4X"
+                    data-codename="santoni"
+                    data-maintainer="N1709"
+                    data-url="">Download</button>
+                <button class="btn-spec"
+                    data-name="Redmi 4X"
+                    data-specs="Chipset: Snapdragon 435
+RAM: 2 / 3 GB
+Storage: 16 / 32 GB
+Display: 5.0&quot; HD
+Battery: 4100 mAh">Specifications</button>
+            </div>
+        </div>
+
+        <div class="card" data-brand="Redmi">
+            <div class="card-top">
+                <img src="devices/ugglite.png" alt="Redmi Note 5A" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">Nova</span><span class="sep">│</span><span class="codename">ugglite</span></span>
+                <h3 class="device-name">Redmi Note 5A</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="Redmi Note 5A"
+                    data-codename="ugglite"
+                    data-maintainer="N1709"
+                    data-url="">Download</button>
+                <button class="btn-spec"
+                    data-name="Redmi Note 5A"
+                    data-specs="Chipset: Snapdragon 425
+RAM: 2 GB
+Storage: 16 GB
+Display: 5.5&quot; HD
+Battery: 3080 mAh">Specifications</button>
+            </div>
+        </div>
+
+        <div class="card" data-brand="Asus">
+            <div class="card-top">
+                <img src="devices/X00TD.png" alt="Asus Zenfone Max Pro M1" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">aepranata</span><span class="sep">│</span><span class="codename">X00TD</span></span>
+                <h3 class="device-name">Asus Zenfone Max Pro M1</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="Asus Zenfone Max Pro M1"
+                    data-codename="X00TD"
+                    data-maintainer="aepranata"
+                    data-url="">Download</button>
+                <button class="btn-spec"
+                    data-name="Asus Zenfone Max Pro M1"
+                    data-specs="Chipset: Snapdragon 636
+RAM: 3 / 4 / 6 GB
+Storage: 32 / 64 / 128 GB
+Display: 5.99&quot; IPS LCD
+Battery: 5000 mAh">Specifications</button>
+            </div>
+        </div>
+
+        <div class="card" data-brand="Xiaomi">
+            <div class="card-top">
+                <img src="devices/daisy.png" alt="Xiaomi Mi A2 Lite" onerror="this.style.display='none'">
+                <span class="device-meta"><span class="maint-text">Farhan</span><span class="sep">│</span><span class="codename">daisy</span></span>
+                <h3 class="device-name">Xiaomi Mi A2 Lite</h3>
+            </div>
+            <div class="card-actions">
+                <button class="btn-download"
+                    data-name="Xiaomi Mi A2 Lite"
+                    data-codename="daisy"
+                    data-maintainer="Farhan"
+                    data-url="">Download</button>
+                <button class="btn-spec"
+                    data-name="Xiaomi Mi A2 Lite"
+                    data-specs="Chipset: Snapdragon 625
+RAM: 3 / 4 GB
+Storage: 32 / 64 GB
+Display: 5.84&quot; IPS LCD
+Battery: 4000 mAh">Specifications</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <div class="modal-body" id="modalBody"></div>
+            <button class="btn-close" id="btnClose">Close</button>
+        </div>
+    </div>
+
+    <footer><p>© 2026 AetheriaOS. All rights reserved.</p></footer>
+
+    <script>
+        const deviceGrid = document.getElementById('deviceGrid');
+        const originalCards = Array.from(deviceGrid.querySelectorAll('.card'));
+
+        const cloneSetBefore = originalCards.map(c => c.cloneNode(true));
+        const cloneSetAfter = originalCards.map(c => c.cloneNode(true));
+        cloneSetBefore.forEach(c => c.classList.add('card-clone'));
+        cloneSetAfter.forEach(c => c.classList.add('card-clone'));
+
+        const fragBefore = document.createDocumentFragment();
+        cloneSetBefore.forEach(c => fragBefore.appendChild(c));
+        deviceGrid.insertBefore(fragBefore, deviceGrid.firstChild);
+
+        const fragAfter = document.createDocumentFragment();
+        cloneSetAfter.forEach(c => fragAfter.appendChild(c));
+        deviceGrid.appendChild(fragAfter);
+
+        let setWidth = deviceGrid.scrollWidth / 3;
+        deviceGrid.scrollLeft = setWidth; 
+
+        function updateSetWidth() {
+            setWidth = deviceGrid.scrollWidth / 3;
+        }
+
+        function recalcSetWidth() {
+            updateSetWidth();
+            deviceGrid.scrollLeft = setWidth; 
+        }
+        window.addEventListener('resize', recalcSetWidth);
+
+        function wrapGridScroll() {
+            const max = deviceGrid.scrollWidth - deviceGrid.clientWidth;
+            if (deviceGrid.scrollLeft <= 0) {
+                deviceGrid.scrollLeft += setWidth;
+                if (gridDragging) gridScrollStart += setWidth;
+            } else if (deviceGrid.scrollLeft >= max) {
+                deviceGrid.scrollLeft -= setWidth;
+                if (gridDragging) gridScrollStart -= setWidth;
+            }
+        }
+        deviceGrid.addEventListener('scroll', wrapGridScroll);
+
+        const searchInput = document.getElementById('searchInput');
+        const brandScroll = document.getElementById('brandScroll');
+        const cards = document.querySelectorAll('.card');
+        const modal = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const btnClose = document.getElementById('btnClose');
+
+        function applyFilters() {
+            const query = searchInput.value.toLowerCase();
+            const activeFilter = brandScroll.querySelector('.brand-chip.active').getAttribute('data-filter');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const brand = card.getAttribute('data-brand');
+                const matchesSearch = text.includes(query);
+                const matchesBrand = activeFilter === 'all' || brand === activeFilter;
+                card.classList.toggle('hidden', !(matchesSearch && matchesBrand));
+            });
+            updateSetWidth();
+        }
+
+        brandScroll.querySelectorAll('.brand-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                brandScroll.querySelectorAll('.brand-chip').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                applyFilters();
+            });
+        });
+
+        searchInput.addEventListener('input', applyFilters);
+
+        document.querySelectorAll('.btn-download').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.url) {
+                    window.open(btn.dataset.url, '_blank');
+                } else {
+                    modalTitle.textContent = btn.dataset.name;
+                    modalBody.textContent = `Maintainer: ${btn.dataset.maintainer || 'Unknown'}\n\nThis ROM isn't available yet or hasn't been added. For now, the ROM file is released on the Telegram channel.`;
+                    delete btnClose.dataset.url;
+                    btnClose.textContent = 'Close';
+                    modal.classList.add('active');
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-spec').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalTitle.textContent = btn.dataset.name;
+                modalBody.textContent = btn.dataset.specs;
+                delete btnClose.dataset.url;
+                btnClose.textContent = 'Close';
+                modal.classList.add('active');
+            });
+        });
+
+        btnClose.addEventListener('click', () => {
+            if (btnClose.dataset.url) {
+                window.open(btnClose.dataset.url, '_blank');
+            }
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+
+        const navEl = document.querySelector('nav');
+        const navHandle = document.getElementById('navHandle');
+
+        navEl.addEventListener('animationend', () => {
+            navEl.style.animation = 'none';
+        }, { once: true });
+
+        function hideNav() {
+            navEl.classList.add('nav-hidden');
+            navHandle.classList.add('visible');
+        }
+        function showNav() {
+            navEl.classList.remove('nav-hidden');
+            navHandle.classList.remove('visible');
+        }
+
+        function makeDraggable(el, { onHide, onShow, direction }) {
+            let dragging = false;
+            let startY = 0;
+
+            function onMove(e) {
+                if (!dragging) return;
+                const deltaY = e.clientY - startY;
+                if (direction === 'hide' && deltaY < 0) {
+                    navEl.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
+                } else if (direction === 'show' && deltaY > 0) {
+                    navEl.style.transform = `translateX(-50%) translateY(${-150 + Math.min(deltaY, 150) / 150 * 150}%)`;
+                }
+            }
+
+            function onUp(e) {
+                if (!dragging) return;
+                dragging = false;
+                navEl.style.transition = '';
+                navEl.style.transform = '';
+                const deltaY = e.clientY - startY;
+                if (direction === 'hide' && deltaY < -25) onHide();
+                if (direction === 'show' && deltaY > 25) onShow();
+                window.removeEventListener('pointermove', onMove);
+                window.removeEventListener('pointerup', onUp);
+            }
+
+            el.addEventListener('pointerdown', (e) => {
+                dragging = true;
+                startY = e.clientY;
+                navEl.style.transition = 'none';
+                window.addEventListener('pointermove', onMove);
+                window.addEventListener('pointerup', onUp);
+            });
+        }
+
+        makeDraggable(navEl, { onHide: hideNav, direction: 'hide' });
+        makeDraggable(navHandle, { onShow: showNav, direction: 'show' });
+
+        navHandle.addEventListener('click', showNav);
+
+        let gridDragging = false;
+        let gridStartX = 0;
+        let gridScrollStart = 0;
+        let gridMoved = false;
+
+        deviceGrid.addEventListener('pointerdown', (e) => {
+            if (e.pointerType !== 'mouse') return;
+            if (e.button !== 0) return;
+            gridDragging = true;
+            gridMoved = false;
+            gridStartX = e.clientX;
+            gridScrollStart = deviceGrid.scrollLeft;
+            deviceGrid.classList.add('dragging');
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!gridDragging) return;
+            const dx = e.clientX - gridStartX;
+            if (Math.abs(dx) > 3) gridMoved = true;
+            deviceGrid.scrollLeft = gridScrollStart - dx;
+            wrapGridScroll();
+        });
+
+        function endGridDrag() {
+            if (!gridDragging) return;
+            gridDragging = false;
+            deviceGrid.classList.remove('dragging');
+        }
+        window.addEventListener('pointerup', endGridDrag);
+        window.addEventListener('pointercancel', endGridDrag);
+
+        deviceGrid.addEventListener('click', (e) => {
+            if (gridMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, { capture: true });
+    </script>
+</body>
+</html>
