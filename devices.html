@@ -57,26 +57,25 @@
         }
 
         @keyframes navReveal {
-            0% { transform: translateX(-50%) translateY(-150%); opacity: 0; }
-            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            0% { transform: translateY(-150%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
 
         nav {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1200px;
+            top: 25px;
+            left: 25px;
+            right: 25px;
+            width: auto;
             z-index: 1000;
             background: var(--nav-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 100px;
-            padding: 8px 10px 8px 26px;
+            padding: 8px 22px 8px 28px;
             display: grid;
-            grid-template-columns: auto minmax(140px, 220px) 1fr;
+            grid-template-columns: auto minmax(140px, 220px) 1fr auto;
             align-items: center;
             gap: 12px;
             animation: navReveal 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
@@ -84,7 +83,7 @@
         }
 
         nav.nav-hidden {
-            transform: translateX(-50%) translateY(-150%);
+            transform: translateY(-150%);
         }
         nav { touch-action: pan-x; cursor: grab; }
         nav:active { cursor: grabbing; }
@@ -112,14 +111,89 @@
         }
         .nav-handle:hover { background: rgba(255, 255, 255, 0.6); }
 
-        .back-home {
+        .nav-left { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+        .nav-links { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+        .nav-links a {
             color: var(--text-dim);
             text-decoration: none;
             font-size: 0.85rem;
-            transition: 0.3s;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 50px;
+            transition: color 0.25s ease, background 0.25s ease;
             white-space: nowrap;
         }
-        .back-home:hover { color: white; }
+        .nav-links a:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.08); }
+        .nav-links a.active { color: #000; background: #ffffff; }
+        .nav-links a:active { transform: scale(0.95); }
+
+        .avatar-menu { position: relative; flex: 0 0 auto; }
+        .avatar-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            padding: 0;
+            cursor: pointer;
+            overflow: hidden;
+            background: #111;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.3s;
+        }
+        .avatar-btn:hover { border-color: rgba(255,255,255,0.4); transform: scale(1.05); }
+        .avatar-btn:active { transform: scale(0.88); }
+        .avatar-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .avatar-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 8px;
+            min-width: 160px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform-origin: top left;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-16px) scale(0.75);
+            transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.4s;
+        }
+        .avatar-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        .avatar-dropdown a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: white;
+            color: black;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 10px 22px;
+            border-radius: 50px;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), background 0.2s, opacity 0.25s ease;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+        .avatar-dropdown.open a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .avatar-dropdown.open a:nth-child(1) { transition-delay: 0.05s; }
+        .avatar-dropdown.open a:nth-child(2) { transition-delay: 0.1s; }
+        .avatar-dropdown a:hover { transform: scale(1.05); background: #f0f0f0; }
+        .avatar-dropdown a:active { transform: scale(0.95); }
 
         .nav-search {
             width: 100%;
@@ -141,7 +215,7 @@
             gap: 8px;
             overflow-x: auto;
             min-width: 0;
-            justify-content: center;
+            justify-content: flex-start;
             scrollbar-width: none;
             -ms-overflow-style: none;
             -webkit-overflow-scrolling: touch;
@@ -171,9 +245,12 @@
         h1 { font-size: 3.5rem; font-weight: 400; margin-bottom: 10px; letter-spacing: -1.5px; }
         h1 span { color: var(--text-dim); font-weight: 400; }
 
-        @media (max-width: 700px) {
-            nav { grid-template-columns: auto 1fr; }
+        @media (max-width: 900px) {
+            nav { grid-template-columns: auto 1fr auto; }
             .nav-search { display: none; }
+        }
+        @media (max-width: 560px) {
+            .nav-links a { padding: 8px 10px; font-size: 0.78rem; }
         }
 
         @media (max-width: 480px) {
@@ -253,9 +330,11 @@
         .card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.2); background: #0c1016; }
         .card.hidden { display: none; }
 
-        .card img { height: 200px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 25px; }
+        .card-top { display: flex; flex-direction: column; align-items: center; }
 
-        .device-name { font-size: 1.3rem; font-weight: 400; color: white; margin-bottom: 30px; }
+        .card img { height: 200px; width: auto; max-width: 100%; object-fit: contain; margin-top: 20px; }
+
+        .device-name { font-size: 1.3rem; font-weight: 400; color: white; margin-bottom: 0; }
         .device-meta { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.7; }
         .device-meta .codename { font-family: monospace; }
         .device-meta .sep { opacity: 0.4; }
@@ -314,8 +393,6 @@
         footer { text-align: center; padding: 60px; color: #444; border-top: 1px solid var(--border); font-size: 0.8rem; }
 
         @media (max-width: 900px) {
-            .nav-left { display: none; }
-            nav { grid-template-columns: 1fr 1fr; }
             h1 { font-size: 2.5rem; }
         }
     </style>
@@ -325,7 +402,15 @@
     <div class="glare-bg"></div>
 
     <nav>
-        <a href="./index.html" class="back-home">← Back to Home</a>
+        <div class="avatar-menu">
+            <button class="avatar-btn" id="avatarBtn" aria-label="More links">
+                <img src="profile/avatar.png" alt="Foto Profil" width="200" height="200">
+            </button>
+            <div class="avatar-dropdown" id="avatarDropdown">
+                <a href="https://github.com/AetheriaOS" target="_blank">GitHub</a>
+                <a href="https://t.me/AetheriaOS_AOSP" target="_blank">Telegram</a>
+            </div>
+        </div>
         <input type="text" id="searchInput" class="nav-search" placeholder="Search...">
         <div class="brand-scroll" id="brandScroll">
             <button class="brand-chip active" data-filter="all">All</button>
@@ -334,6 +419,11 @@
             <button class="brand-chip" data-filter="Poco">Poco</button>
             <button class="brand-chip" data-filter="Sony">Sony</button>
             <button class="brand-chip" data-filter="Asus">Asus</button>
+        </div>
+        <div class="nav-links">
+            <a href="./index.html#about">About</a>
+            <a href="./devices.html" class="active">Download</a>
+            <a href="./team.html">Team</a>
         </div>
     </nav>
 
@@ -345,13 +435,11 @@
 
     <div class="grid" id="deviceGrid">
 
-      
-
         <div class="card" data-brand="Xiaomi">
             <div class="card-top">
-                <img src="devices/sagit/sagit.png" alt="Xiaomi Mi 6" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">N1709</span><span class="sep">│</span><span class="codename">sagit</span></span>
                 <h3 class="device-name">Xiaomi Mi 6</h3>
+                <img src="devices/sagit/sagit.png" alt="Xiaomi Mi 6" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -371,9 +459,9 @@ Battery: 3350 mAh">Specifications</button>
 
         <div class="card" data-brand="Sony">
             <div class="card-top">
-                <img src="devices/apollo.png" alt="Sony XZ2 Compact" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">Ganx</span><span class="sep">│</span><span class="codename">apollo</span></span>
                 <h3 class="device-name">Sony XZ2 Compact</h3>
+                <img src="devices/apollo/apollo.png" alt="Sony XZ2 Compact" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -393,9 +481,9 @@ Battery: 2870 mAh">Specifications</button>
 
         <div class="card" data-brand="Redmi">
             <div class="card-top">
-                <img src="devices/sweet2.png" alt="Redmi Note 12 Pro 4G" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">ReversedRuler</span><span class="sep">│</span><span class="codename">sweet2</span></span>
                 <h3 class="device-name">Redmi Note 12 Pro 4G</h3>
+                <img src="devices/sweet2/sweet2.png" alt="Redmi Note 12 Pro 4G" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -412,11 +500,11 @@ Display: 6.67&quot; AMOLED
 Battery: 5000 mAh">Specifications</button>
             </div>
         </div>
-<div class="card" data-brand="Poco">
+        <div class="card" data-brand="Poco">
             <div class="card-top">
-                <img src="devices/peridot.png" alt="POCO F6" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">ReversedRuler</span><span class="sep">│</span><span class="codename">peridot</span></span>
                 <h3 class="device-name">POCO F6</h3>
+                <img src="devices/peridot/peridot.png" alt="POCO F6" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -436,9 +524,9 @@ Battery: 5000 mAh">Specifications</button>
 
         <div class="card" data-brand="Redmi">
             <div class="card-top">
-                <img src="devices/santoni.png" alt="Redmi 4X" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">Alpha</span><span class="sep">│</span><span class="codename">santoni</span></span>
                 <h3 class="device-name">Redmi 4X</h3>
+                <img src="devices/santoni/santoni.png" alt="Redmi 4X" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -458,9 +546,9 @@ Battery: 4100 mAh">Specifications</button>
 
         <div class="card" data-brand="Redmi">
             <div class="card-top">
-                <img src="devices/ugglite.png" alt="Redmi Note 5A" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">Nova</span><span class="sep">│</span><span class="codename">ugglite</span></span>
                 <h3 class="device-name">Redmi Note 5A</h3>
+                <img src="devices/ugglite/ugglite.png" alt="Redmi Note 5A" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -480,9 +568,9 @@ Battery: 3080 mAh">Specifications</button>
 
         <div class="card" data-brand="Asus">
             <div class="card-top">
-                <img src="devices/X00TD.png" alt="Asus Zenfone Max Pro M1" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">aepranata</span><span class="sep">│</span><span class="codename">X00TD</span></span>
                 <h3 class="device-name">Asus Zenfone Max Pro M1</h3>
+                <img src="devices/X00TD/X00TD.png" alt="Asus Zenfone Max Pro M1" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -502,9 +590,9 @@ Battery: 5000 mAh">Specifications</button>
 
         <div class="card" data-brand="Xiaomi">
             <div class="card-top">
-                <img src="devices/daisy.png" alt="Xiaomi Mi A2 Lite" onerror="this.style.display='none'">
                 <span class="device-meta"><span class="maint-text">Farhan</span><span class="sep">│</span><span class="codename">daisy</span></span>
                 <h3 class="device-name">Xiaomi Mi A2 Lite</h3>
+                <img src="devices/daisy/daisy.png" alt="Xiaomi Mi A2 Lite" onerror="this.style.display='none'">
             </div>
             <div class="card-actions">
                 <button class="btn-download"
@@ -536,45 +624,6 @@ Battery: 4000 mAh">Specifications</button>
 
     <script>
         const deviceGrid = document.getElementById('deviceGrid');
-        const originalCards = Array.from(deviceGrid.querySelectorAll('.card'));
-
-        const cloneSetBefore = originalCards.map(c => c.cloneNode(true));
-        const cloneSetAfter = originalCards.map(c => c.cloneNode(true));
-        cloneSetBefore.forEach(c => c.classList.add('card-clone'));
-        cloneSetAfter.forEach(c => c.classList.add('card-clone'));
-
-        const fragBefore = document.createDocumentFragment();
-        cloneSetBefore.forEach(c => fragBefore.appendChild(c));
-        deviceGrid.insertBefore(fragBefore, deviceGrid.firstChild);
-
-        const fragAfter = document.createDocumentFragment();
-        cloneSetAfter.forEach(c => fragAfter.appendChild(c));
-        deviceGrid.appendChild(fragAfter);
-
-        let setWidth = deviceGrid.scrollWidth / 3;
-        deviceGrid.scrollLeft = setWidth; 
-
-        function updateSetWidth() {
-            setWidth = deviceGrid.scrollWidth / 3;
-        }
-
-        function recalcSetWidth() {
-            updateSetWidth();
-            deviceGrid.scrollLeft = setWidth; 
-        }
-        window.addEventListener('resize', recalcSetWidth);
-
-        function wrapGridScroll() {
-            const max = deviceGrid.scrollWidth - deviceGrid.clientWidth;
-            if (deviceGrid.scrollLeft <= 0) {
-                deviceGrid.scrollLeft += setWidth;
-                if (gridDragging) gridScrollStart += setWidth;
-            } else if (deviceGrid.scrollLeft >= max) {
-                deviceGrid.scrollLeft -= setWidth;
-                if (gridDragging) gridScrollStart -= setWidth;
-            }
-        }
-        deviceGrid.addEventListener('scroll', wrapGridScroll);
 
         const searchInput = document.getElementById('searchInput');
         const brandScroll = document.getElementById('brandScroll');
@@ -594,7 +643,6 @@ Battery: 4000 mAh">Specifications</button>
                 const matchesBrand = activeFilter === 'all' || brand === activeFilter;
                 card.classList.toggle('hidden', !(matchesSearch && matchesBrand));
             });
-            updateSetWidth();
         }
 
         brandScroll.querySelectorAll('.brand-chip').forEach(btn => {
@@ -665,9 +713,9 @@ Battery: 4000 mAh">Specifications</button>
                 if (!dragging) return;
                 const deltaY = e.clientY - startY;
                 if (direction === 'hide' && deltaY < 0) {
-                    navEl.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
+                    navEl.style.transform = `translateY(${deltaY}px)`;
                 } else if (direction === 'show' && deltaY > 0) {
-                    navEl.style.transform = `translateX(-50%) translateY(${-150 + Math.min(deltaY, 150) / 150 * 150}%)`;
+                    navEl.style.transform = `translateY(${-150 + Math.min(deltaY, 150) / 150 * 150}%)`;
                 }
             }
 
@@ -697,6 +745,18 @@ Battery: 4000 mAh">Specifications</button>
 
         navHandle.addEventListener('click', showNav);
 
+        const avatarBtn = document.getElementById('avatarBtn');
+        const avatarDropdown = document.getElementById('avatarDropdown');
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!avatarDropdown.contains(e.target) && e.target !== avatarBtn) {
+                avatarDropdown.classList.remove('open');
+            }
+        });
+
         let gridDragging = false;
         let gridStartX = 0;
         let gridScrollStart = 0;
@@ -717,7 +777,6 @@ Battery: 4000 mAh">Specifications</button>
             const dx = e.clientX - gridStartX;
             if (Math.abs(dx) > 3) gridMoved = true;
             deviceGrid.scrollLeft = gridScrollStart - dx;
-            wrapGridScroll();
         });
 
         function endGridDrag() {
