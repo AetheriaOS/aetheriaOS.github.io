@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AetheriaOS - Custom ROM</title>
+    <title>AetheriaOS</title>
     <link href="https://fonts.cdnfonts.com/css/product-sans" rel="stylesheet">
     <style>
         :root {
@@ -103,7 +103,7 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 100px;
-            padding: 8px 22px 8px 28px;
+            padding: 6px 18px 6px 6px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -173,13 +173,17 @@
 
         .avatar-menu { position: relative; }
         .avatar-btn {
-            width: 40px; height: 40px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             border: 1px solid var(--border);
             padding: 0;
             cursor: pointer;
             overflow: hidden;
             background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
             transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.3s;
         }
         .avatar-btn:hover { border-color: rgba(255,255,255,0.4); transform: scale(1.05); }
